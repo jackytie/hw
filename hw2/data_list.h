@@ -33,7 +33,11 @@ class DataListVector{
 		property_sort_compare(const DataListVector& input) : data(input){}
 		bool operator()(const OneLineRecord* a, const OneLineRecord* b);
 	};
-
+	struct record_sort_compare{
+		const DataListVector& data;
+		record_sort_compare(const DataListVector& input) : data(input){}
+		bool operator()(OneLineRecord a, OneLineRecord b); 
+	};
 	public:
 	DataListVector(){}
 	DataListVector(unsigned int data_init_size); 
@@ -62,8 +66,5 @@ class DataListVector{
 	void BuildPropertyList(vector<OneLineRecord*>& list, int& index, int end, int ad);
 	int GetFstAdIndex(int ad, int user_begin, int user_end);
 };
-class CompareClass{
-	public:
-	bool operator()(OneLineRecord a, OneLineRecord b); 
-};
+
 

@@ -61,7 +61,6 @@ int DataListVector::GetUserListIndex(int userid){
 	int less_or_more, notfound = 0;
 
 	while((less_or_more = CompareLessOrMore(&userid, &(UserList[index].UserID), 1)) != 0 && notfound != 1){
-//printf("cur_userid = %d less|more = %d\n",UserList[index].UserID, less_or_more);
 		if(less_or_more > 0){
 			if(index == upper_bound-1)
 				notfound = 1;
@@ -80,7 +79,6 @@ int DataListVector::GetUserListIndex(int userid){
 		}
 	}
 	if(notfound){
-		//printf("not found\n");
 		return -1;
 	}
 	return index;
@@ -88,7 +86,7 @@ int DataListVector::GetUserListIndex(int userid){
 
 //-------------------------------------------sort----------------------------------------------
 
-bool CompareClass::operator()(OneLineRecord a, OneLineRecord b){
+bool DataListVector::record_sort_compare::operator()(OneLineRecord a, OneLineRecord b){
 	if(a.UserID != b.UserID)
 		return (a.UserID < b.UserID);
 	if(a.AdID != b.AdID)
@@ -99,29 +97,13 @@ bool CompareClass::operator()(OneLineRecord a, OneLineRecord b){
 		return (a.Position < b.Position);
 	if(a.Depth != b.Depth)
 		return (a.Depth < b.Depth);
-/*	if(a.DisplayURL != b.DisplayURL)
-		return (a.DisplayURL < b.DisplayURL);
-	if(a.AdvertiserID != b.AdvertiserID)
-		return (a.AdvertiserID < b.AdvertiserID);
-	if(a.KeywordID != b.KeywordID)
-		return (a.KeywordID < b.KeywordID);
-	if(a.TitleID != b.TitleID)
-		return (a.TitleID < b.TitleID);
-	if(a.DescriptionID != b.DescriptionID)
-		return (a.DescriptionID < b.DescriptionID);
-*/
-
 
 	return false;
 }
 
 void DataListVector::SortUAQDPAndBuildUserList(){
-	CompareClass compare_functor;
-//printf("wait for sorting...\n");
-	std::sort(RecordList.begin(), RecordList.end(), compare_functor);
-//printf("has sorted\nprepare user list\n");
+	std::sort(RecordList.begin(), RecordList.end(), record_sort_compare(*this));
 	PrepareUserList();
-//printf("is ready\n");
 }
 
 //--------------------------------------------prepare UserList----------------------------------
@@ -141,7 +123,6 @@ void DataListVector::PrepareUserList(){
 //-------------------------------------------get(u,a,q,d,p)----------------------------------------------
 
 void DataListVector::get(int userid, int ad, int query, int pos, int depth){
-//printf("\n");
 	int index = GetFstUAQPDRecord(userid, ad, query, pos, depth);
 	if(index == -1){
 		printf("0 0\n");
@@ -152,7 +133,6 @@ void DataListVector::get(int userid, int ad, int query, int pos, int depth){
 	int input_array[5] = {userid, ad, query, pos, depth};
 	unsigned int click = 0, impression = 0;
 	do{
-//RecordList[index].print();
 		click += RecordList[index].Click;
 		impression += RecordList[index].Impression;
 		index++;
@@ -213,7 +193,6 @@ int DataListVector::GetFstUAQPDRecord(int userid, int ad, int query, int pos, in
 		}
 	}
 	if(notfound){
-//		printf("not found\n");
 		return -1;
 	}
 	return index;
@@ -286,12 +265,9 @@ bool DataListVector::property_sort_compare::operator()(const OneLineRecord* a, c
 }
 void DataListVector::BuildPropertyList(vector<OneLineRecord*>& list, int& index, int end, int ad){
 	while(RecordList[index].AdID == ad && index <= end){
-//printf("%d i ",index);
-//RecordList[index].print();
 		list.push_back(&(RecordList[index]));
 		index++;
 	}
-//printf("size=%lu\n",list.size());
 	std::sort(list.begin(), list.end(), property_sort_compare(*this));
 }
 void DataListVector::PrintCommonAd(int& index1, int end1, int& index2, int end2){
@@ -303,62 +279,41 @@ void DataListVector::PrintCommonAd(int& index1, int end1, int& index2, int end2)
 	BuildPropertyList(property_list1, index1, end1, ad);
 	BuildPropertyList(property_list2, index2, end2, ad);
 	int i1=0, i2=0, e1=property_list1.size(), e2=property_list2.size();
-//for(int i=0; i<e1; i++)
-//property_list1[i]->print();
-//printf("\n");
-//for(int i=0; i<e2; i++)
-//property_list2[i]->print();
 	printf("%d\n",ad);
 	while(i1 < e1 || i2 < e2){
-//printf("--\n");
 		if(i1 < e1 && i2 < e2)
 			cmp = AdPropertyCompare(*(property_list1[i1]), *(property_list2[i2]));
 		if((i1<e1 && cmp<0) || i2>=e2){
 			printf("\t");
 			property_list1[i1]->PrintAdProperty();
-//printf("i1=%d\n",i1);
 			tmp = property_list1[i1];
-//printf("< ");tmp->print();
 			do{
 				i1++;
 			}while(i1 < e1 && AdPropertyCompare(*(property_list1[i1]), (*tmp)) == 0);
-//printf("i1=%d\n",i1);
-//if(i1<e1)property_list1[i1]->print();else printf("out\n");
 			continue;
 		}
 		if((i2<e2 && cmp > 0) || i1>=e1){
 			printf("\t");
 			property_list2[i2]->PrintAdProperty();
-//printf("i2=%d\n",i2);
 
 			tmp = property_list2[i2];
-//printf("> ");tmp->print();
 			do{
-//printf("i2=%d\n",i2);
 				i2++;
 			}while(i2 < e2 && AdPropertyCompare(*(property_list2[i2]), (*tmp)) == 0);
-//printf("i2=%d\n",i2);
 
-//if(i2<e2)property_list2[i2]->print();else printf("out\n");
 			continue;
 		}
 
 		printf("\t");
 		property_list1[i1]->PrintAdProperty();
-//printf("i1=%d i2=%d\n",i1,i2);
 
 		tmp = property_list1[i1];
-//printf("= ");tmp->print();
 		do{
 			i1++;
 		}while(i1 < e1 && AdPropertyCompare(*(property_list1[i1]), *tmp) == 0);
-//printf("i1=%d\n",i1);
-//if(i1<e1)property_list1[i1]->print();else printf("out\n");
 		do{
 			i2++;
 		}while(i2 < e2 && AdPropertyCompare(*(property_list2[i2]), *tmp) == 0);
-//printf("i2=%d\n",i2);
-//if(i2<e2)property_list2[i2]->print();else printf("out\n");
 	}
 }
 
