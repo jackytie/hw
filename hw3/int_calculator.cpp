@@ -168,7 +168,7 @@ int show_infix2postfix(char lineInput[], char postfixExp[], int& answer){
 
 	postfixExp[0] = '\0';
 
-	printf("# transform from indix to postfix\n");
+	printf("# transform from infix to postfix\n");
 	while(!end){
 		switch(getNext(curPos, opr, number, nextIsBinaryOpr)){
 			case OPERATOR:
