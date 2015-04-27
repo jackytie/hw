@@ -241,7 +241,7 @@ int show_infix2postfix(char lineInput[], char postfixExp[], int& answer){
 			default:
 				return WRONG_INPUT;
 		}
-
+		assert(strlen(postfixExp) < sizeof(postfixExp)-15); 
 		printf("\tcurrent stack:");
 		for(unsigned int i=0; i < oprStack.size(); i++)
 			printf(" %c",oprStack[i]);
@@ -257,7 +257,7 @@ int show_infix2postfix(char lineInput[], char postfixExp[], int& answer){
 
 int main(){
 	char line[MAX_LINE_SIZE+1];
-	char postfixExp[MAX_LINE_SIZE+1];
+	char postfixExp[2*MAX_LINE_SIZE+1];
 	int answer, error;
 
 	while(fgets(line, MAX_LINE_SIZE, stdin) != NULL){
