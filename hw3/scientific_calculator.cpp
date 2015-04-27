@@ -278,7 +278,7 @@ int show_infix2postfix(char lineInput[], char postfixExp[], double& answer){
 
 int main(){
 	char line[MAX_LINE_SIZE+1];
-	char postfixExp[MAX_LINE_SIZE+1];
+	char postfixExp[2*MAX_LINE_SIZE+1];
 	int error;
 	double answer;
 
